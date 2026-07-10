@@ -198,3 +198,8 @@ See **`deploy/AWS_DEPLOYMENT.md`** for the full click‑by‑click guide, plus t
 
 See **`INTERVIEW_GUIDE.md`** for the exact questions you'll be asked and clear,
 correct answers you can say in your own words.
+
+New to the project or want to understand every line? Read
+**`STUDY_GUIDE.md`** — a complete, beginner-friendly A-to-Z walkthrough of every
+file, every key line of code, the concepts behind it, and how each piece fits
+into the workflow.
