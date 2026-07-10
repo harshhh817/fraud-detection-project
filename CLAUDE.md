@@ -52,6 +52,20 @@ An end-to-end **credit-card fraud detection** system:
 Verified working end-to-end (July 2026): fraud row → flagged at ~1.0; normal
 row → OK; all 6 tests pass; dashboard renders the prediction log.
 
+**DEPLOYED & LIVE (July 2026)** — personal AWS account, region `eu-north-1`:
+- Live API: `https://ry6rjihdqk.execute-api.eu-north-1.amazonaws.com/predict`
+  (API Gateway HTTP API `fraud-api` → Lambda `fraud-detection`, x86_64,
+  512 MB / 30 s, CORS `*` for POST/OPTIONS). Real metrics: recall 0.86.
+- DynamoDB logging is ON: table `fraud-predictions` (partition key `id`),
+  Lambda env var `FRAUD_LOG_TABLE=fraud-predictions`, role has DynamoDB access.
+- Lambda zip lessons (see deploy guide): install Linux wheels
+  (`--platform manylinux2014_x86_64`), model loads via native `xgboost.Booster`
+  (NOT the sklearn wrapper) to avoid shipping scikit-learn, trim tests/.pyi to
+  stay under the 50 MB console-upload limit.
+- Demo the web page over http (`cd web && python3 -m http.server 8000` →
+  `http://localhost:8000`); opening the file directly gives origin `null`,
+  which CORS rejects.
+
 **Gotcha:** `scikit-learn` is pinned to 1.5.2 in requirements.txt — 1.6+
 removed an internal API that breaks `xgboost`'s `save_model()`.
 
