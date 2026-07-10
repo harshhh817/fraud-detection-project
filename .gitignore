@@ -1,0 +1,20 @@
+# Python junk
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# The real Kaggle dataset is too big for GitHub (and shouldn't be re-shared).
+# Anyone cloning the repo can regenerate sample data or download it themselves.
+data/creditcard.csv
+
+# Local prediction log (created while you test; not part of the source code)
+data/prediction_log.csv
+
+# Lambda build output
+build/
+fraud_lambda.zip
+
+# Editor/OS clutter
+.DS_Store
+.vscode/
+.idea/

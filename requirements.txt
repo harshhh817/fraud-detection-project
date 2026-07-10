@@ -1,0 +1,19 @@
+# Python libraries this project needs.
+# Install them all with:  pip install -r requirements.txt
+
+# --- Core: needed to train the model and run the API ---
+numpy
+pandas
+# Pinned: newer scikit-learn (1.6+) removed an internal API that xgboost's
+# save_model() still depends on, which breaks training with a confusing error.
+scikit-learn==1.5.2
+xgboost
+flask
+
+# --- Optional extras (features from the "next steps") ---
+# Only needed for the parts named next to each line. Everything above works
+# without these, so you can delete any you don't want.
+pytest              # run the unit tests:  python -m pytest -v
+imbalanced-learn    # enables the SMOTE comparison in train/train_model.py
+streamlit           # the monitoring dashboard: streamlit run dashboard/dashboard.py
+boto3               # DynamoDB logging + dashboard on AWS (pre-installed on Lambda)

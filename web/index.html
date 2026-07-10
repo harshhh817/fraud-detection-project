@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fraud Detection Demo</title>
+<!--
+  =========================================================================
+  index.html  --  THE DEMO WEB PAGE
+  -------------------------------------------------------------------------
+  This is a simple page with a "Check transaction" button. When you click it,
+  the page sends a transaction to your API and shows whether it's fraud.
+
+  HOW TO USE:
+    1. Start your API first:
+         - Locally:  python app/local_api.py   (URL is http://127.0.0.1:5001/predict)
+         - On AWS:   use your API Gateway URL
+    2. Paste that URL into the "API URL" box below.
+    3. Click "Load NORMAL example" or "Load FRAUD example", then "Check".
+  =========================================================================
+-->
+<style>
+  body { font-family: system-ui, Arial, sans-serif; max-width: 720px; margin: 30px auto; padding: 0 16px; color: #1a1a2e; }
+  h1 { font-size: 22px; }
+  .card { border: 1px solid #ddd; border-radius: 10px; padding: 18px; margin-top: 16px; }
+  label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; }
+  input, textarea { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-family: monospace; font-size: 13px; }
+  textarea { height: 120px; }
+  button { border: 0; border-radius: 6px; padding: 10px 14px; font-size: 14px; cursor: pointer; margin: 6px 6px 0 0; }
+  .primary { background: #2d6cdf; color: #fff; }
+  .ghost { background: #eee; color: #333; }
+  #result { margin-top: 16px; font-size: 18px; font-weight: bold; padding: 14px; border-radius: 8px; display: none; }
+  .fraud { background: #ffe3e3; color: #b40000; }
+  .ok { background: #e3ffe8; color: #067d2f; }
+  small { color: #777; }
+</style>
+</head>
+<body>
+  <h1>💳 Credit Card Fraud Detection</h1>
+  <p><small>A student project: an ML model that predicts whether a transaction is fraudulent, served through an API.</small></p>
+
+  <div class="card">
+    <label>API URL (where your model is running)</label>
+    <input id="apiUrl" value="http://127.0.0.1:5001/predict" />
+    <small>Local test: keep the default. On AWS: paste your API Gateway URL.</small>
+
+    <div style="margin-top:14px;">
+      <label>Transaction data (JSON)</label>
+      <textarea id="payload">{"Amount": 100}</textarea>
+    </div>
+
+    <button class="ghost" onclick="loadNormal()">Load NORMAL example</button>
+    <button class="ghost" onclick="loadFraud()">Load FRAUD example</button>
+    <button class="primary" onclick="check()">Check transaction</button>
+
+    <div id="result"></div>
+  </div>
+
+<script>
+  // These two example transactions come from the sample dataset so you can
+  // instantly see the model catch fraud vs. pass a normal transaction.
+  const NORMAL_EXAMPLE = { "Amount": 88, "V1": 0, "V2": 0, "V3": 0, "V4": 0 };
+  const FRAUD_EXAMPLE = {};
+  // A fraud example: in our data, fraud rows have all V1..V28 shifted up ~2.
+  for (let i = 1; i <= 28; i++) FRAUD_EXAMPLE["V" + i] = 2.2;
+  FRAUD_EXAMPLE["Amount"] = 650;
+
+  function loadNormal() { document.getElementById('payload').value = JSON.stringify(NORMAL_EXAMPLE, null, 2); }
+  function loadFraud()  { document.getElementById('payload').value = JSON.stringify(FRAUD_EXAMPLE, null, 2); }
+
+  async function check() {
+    const url = document.getElementById('apiUrl').value.trim();
+    const box = document.getElementById('result');
+    let payload;
+    try { payload = JSON.parse(document.getElementById('payload').value); }
+    catch (e) { alert("The transaction JSON is not valid. Fix it and try again."); return; }
+
+    box.style.display = 'block';
+    box.className = '';
+    box.textContent = 'Checking...';
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.error) { box.textContent = 'Error: ' + data.error; return; }
+
+      const pct = (data.fraud_probability * 100).toFixed(2);
+      if (data.is_fraud) {
+        box.className = 'fraud';
+        box.textContent = `🚨 ${data.decision}  (fraud probability: ${pct}%)`;
+      } else {
+        box.className = 'ok';
+        box.textContent = `✅ ${data.decision}  (fraud probability: ${pct}%)`;
+      }
+    } catch (e) {
+      box.className = 'fraud';
+      box.textContent = 'Could not reach the API. Is it running? (' + e.message + ')';
+    }
+  }
+</script>
+</body>
+</html>
