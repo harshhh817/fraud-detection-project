@@ -1,11 +1,7 @@
 {
   "version": "0.0.1",
   "configurations": [
-    {
-      "name": "dashboard",
-      "runtimeExecutable": "streamlit",
-      "runtimeArgs": ["run", "dashboard/dashboard.py", "--server.port", "8501", "--server.headless", "true"],
-      "port": 8501
-    }
+    { "name": "dashboard", "runtimeExecutable": "streamlit", "runtimeArgs": ["run", "dashboard/dashboard.py", "--server.port", "8501", "--server.headless", "true"], "port": 8501 },
+    { "name": "webdemo", "runtimeExecutable": "python3", "runtimeArgs": ["-m", "http.server", "8000", "--directory", "web"], "port": 8000 }
   ]
 }
