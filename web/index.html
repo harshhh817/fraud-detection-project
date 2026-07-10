@@ -14,8 +14,11 @@
   HOW TO USE:
     1. Start your API first:
          - Locally:  python app/local_api.py   (URL is http://127.0.0.1:5001/predict)
-         - On AWS:   use your API Gateway URL
-    2. Paste that URL into the "API URL" box below.
+         - On AWS:   use your API Gateway URL (already filled in below)
+    2. IMPORTANT: don't double-click this file. Browsers give file:// pages the
+       origin "null", which CORS rejects. Instead serve it over http first:
+         cd web && python3 -m http.server 8000
+       then open  http://localhost:8000  in your browser.
     3. Click "Load NORMAL example" or "Load FRAUD example", then "Check".
   =========================================================================
 -->
