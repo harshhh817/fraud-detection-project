@@ -1,0 +1,12 @@
+# Pin a LIGHT theme so charts and widgets match the dashboard's design
+# (otherwise Streamlit follows the OS dark mode and charts render dark).
+[theme]
+base = "light"
+primaryColor = "#3a6ff7"
+backgroundColor = "#f4f6fb"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#0f1c2e"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"

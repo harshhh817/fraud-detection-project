@@ -16,4 +16,5 @@ flask
 pytest              # run the unit tests:  python -m pytest -v
 imbalanced-learn    # enables the SMOTE comparison in train/train_model.py
 streamlit           # the monitoring dashboard: streamlit run dashboard/dashboard.py
+altair              # themed charts inside the dashboard (bundled with streamlit)
 boto3               # DynamoDB logging + dashboard on AWS (pre-installed on Lambda)
