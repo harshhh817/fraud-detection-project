@@ -36,8 +36,12 @@ MODEL_PATH = os.path.join(HERE, "fraud_model.json")
 COLUMNS_PATH = os.path.join(HERE, "feature_columns.json")
 THRESHOLD_PATH = os.path.join(HERE, "threshold.json")   # optional (see below)
 
-_model = xgb.XGBClassifier()
-_model.load_model(MODEL_PATH)
+# We load the model with xgboost's NATIVE "Booster" (not the scikit-learn
+# XGBClassifier wrapper). The wrapper would require scikit-learn to be installed
+# at prediction time, which is a large library we don't want to ship to AWS
+# Lambda. The Booster gives the exact same predictions with no sklearn needed.
+_booster = xgb.Booster()
+_booster.load_model(MODEL_PATH)
 
 with open(COLUMNS_PATH) as f:
     FEATURE_COLUMNS = json.load(f)   # the exact order of inputs the model expects
@@ -65,9 +69,13 @@ def predict(transaction: dict):
     # Build the input row in the EXACT column order the model was trained on.
     # If a feature is missing from the request, we default it to 0.
     row = [float(transaction.get(col, 0)) for col in FEATURE_COLUMNS]
-    X = np.array([row])
 
-    proba = float(_model.predict_proba(X)[0][1])   # probability it is fraud (0..1)
+    # DMatrix is xgboost's own input format. Because we already put the values in
+    # the trained column order, we turn off feature-name checking. The model was
+    # trained with objective "binary:logistic", so predict() returns the
+    # probability of fraud (class 1) directly - no [0][1] indexing needed.
+    dmatrix = xgb.DMatrix(np.array([row]))
+    proba = float(_booster.predict(dmatrix, validate_features=False)[0])
     is_fraud = proba >= THRESHOLD                    # tuned (or default 0.5) cut-off
 
     return {
