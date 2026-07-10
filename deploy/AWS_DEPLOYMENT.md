@@ -6,6 +6,41 @@ for). Take your time; each step is small.
 
 > **Before anything else — the safety net.** The moment your AWS account is
 > ready, do Step 0. It guarantees you can never get a surprise bill.
+> *(Using an AWS Academy account? Read the Academy section just below first —
+> you can skip Step 0 entirely.)*
+
+---
+
+## Using an AWS Academy (Learner Lab) account? Read this first
+
+Academy accounts work perfectly for this project and are even safer than a
+personal account — there's no card attached, so you cannot be billed. Four
+things are different from the steps below:
+
+1. **SKIP Step 0** (the budget alert). The Billing console is blocked in
+   Academy accounts, and you don't need it. Your lab page shows a credit
+   meter instead; this project will use roughly $0 of it.
+
+2. **The IAM role — the one gotcha that trips everyone.** Academy accounts
+   can't create new IAM roles, and Lambda's "Create function" screen defaults
+   to creating one. In Step 2, expand **"Change default execution role"** →
+   choose **"Use an existing role"** → pick **`LabRole`**. Do this or the
+   creation fails. Bonus: `LabRole` already includes DynamoDB permissions,
+   so in Step 5 you can skip the "add the policy" part too.
+
+3. **Click "Start Lab" first, every time.** Wait for the dot next to "AWS"
+   to turn green, then click it to open the console. Sessions last ~4 hours,
+   but everything you build (Lambda, API Gateway, DynamoDB) **persists
+   between sessions** — you never rebuild. Being serverless, your API keeps
+   answering even while your lab session is off; test it once from your phone.
+
+4. **Stay in the `us-east-1` region.** Academy labs are locked to it. If a
+   console page looks mysteriously empty, check the region picker (top-right)
+   before panicking.
+
+⚠️ **One real caveat:** Academy accounts are wiped when your course ends.
+Before that date, record a short screen video of the live demo and screenshot
+the Lambda + API Gateway consoles for your report — permanent proof it ran.
 
 ---
 
@@ -71,6 +106,8 @@ You now have `fraud_lambda.zip`.
 
 1. Console → **Lambda** → **Create function** → **Author from scratch**.
 2. Name: `fraud-detection`. Runtime: **Python 3.12**. Architecture: leave default.
+   *(AWS Academy account: expand "Change default execution role" → "Use an
+   existing role" → `LabRole` — see the Academy section at the top.)*
 3. Create the function.
 4. In **Code** → **Upload from** → **.zip file** (or **Amazon S3** if large) →
    upload `fraud_lambda.zip`.
