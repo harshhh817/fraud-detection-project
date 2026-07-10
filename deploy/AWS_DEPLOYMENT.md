@@ -81,24 +81,41 @@ xgboost**. Here's the straightforward zip approach:
 On your computer, from the project folder:
 
 ```bash
-# 1) Make a build folder and install the libraries INTO it
+# 1) Make a build folder and install the libraries INTO it.
+#    IMPORTANT: Lambda runs on LINUX. If you're on a Mac or Windows, a plain
+#    `pip install` grabs libraries built for YOUR computer, and Lambda will
+#    crash with "invalid ELF header". These flags force the Linux versions:
 mkdir -p build
-pip install xgboost numpy -t build/
+pip install \
+  --platform manylinux2014_x86_64 \
+  --target build/ \
+  --implementation cp \
+  --python-version 3.12 \
+  --only-binary=:all: \
+  xgboost numpy
 
 # 2) Copy your code + model into the same folder
 cp app/lambda_function.py build/
 cp model/fraud_model.json build/
 cp model/feature_columns.json build/
+cp model/threshold.json build/
 
-# 3) Zip everything (the contents, not the folder itself)
-cd build && zip -r ../fraud_lambda.zip . && cd ..
+# 3) Trim files Lambda never needs, so the zip fits the 50 MB upload limit
+find build -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null
+find build -type d -name "tests" -exec rm -rf {} + 2>/dev/null
+rm -rf build/*.dist-info build/bin
+
+# 4) Zip everything (the contents, not the folder itself)
+cd build && zip -rq ../fraud_lambda.zip . && cd ..
 ```
 
-You now have `fraud_lambda.zip`.
+You now have `fraud_lambda.zip` (about 49 MB).
 
 > If the zip is bigger than 50 MB, upload it via an **S3 bucket** instead of
 > directly (the console will offer this). Or use the **container image**
 > option, which Lambda supports up to 10 GB — see the note at the bottom.
+> (The container path also sidesteps the Linux-vs-Mac issue entirely, since
+> Docker builds on Linux.)
 
 ---
 
