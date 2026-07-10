@@ -23,13 +23,21 @@ sys.path.insert(0, os.path.join(ROOT, "app"))
 from lambda_function import predict, FEATURE_COLUMNS
 
 
-# A clearly-normal transaction: all the V-features are 0 (average behaviour).
-NORMAL = {"Amount": 88, "V1": 0, "V2": 0, "V3": 0, "V4": 0}
+# These are REAL rows from the Kaggle dataset: one genuine normal transaction
+# and one genuine fraud, so the tests check the model against real behaviour.
+NORMAL = {"Time": 68.0, "V1": 1.1569, "V2": 0.0372, "V3": 0.5568, "V4": 0.5195,
+          "V5": -0.4798, "V6": -0.3527, "V7": -0.2225, "V8": 0.1582, "V9": 0.0113,
+          "V10": 0.1056, "V11": 1.6121, "V12": 0.3545, "V13": -1.4345, "V14": 0.797,
+          "V15": 0.7451, "V16": 0.2229, "V17": -0.2292, "V18": -0.3648, "V19": -0.2541,
+          "V20": -0.2219, "V21": -0.1827, "V22": -0.6123, "V23": 0.1973, "V24": 0.1749,
+          "V25": 0.0325, "V26": 0.0995, "V27": -0.0268, "V28": 0.0042, "Amount": 2.69}
 
-# A clearly-fraud transaction: in our dataset fraud rows have V1..V28 shifted
-# up by about +2, so we recreate that pattern here.
-FRAUD = {f"V{i}": 2.2 for i in range(1, 29)}
-FRAUD["Amount"] = 650
+FRAUD = {"Time": 7672.0, "V1": 0.7027, "V2": 2.4264, "V3": -5.2345, "V4": 4.4167,
+         "V5": -2.1708, "V6": -2.6676, "V7": -3.8781, "V8": 0.9113, "V9": -0.1662,
+         "V10": -5.0092, "V11": 4.6757, "V12": -8.1672, "V13": 0.6386, "V14": -6.7633,
+         "V15": 1.2969, "V16": -3.8118, "V17": -3.7541, "V18": -1.0492, "V19": 1.5542,
+         "V20": 0.4227, "V21": 0.5512, "V22": -0.0098, "V23": 0.7217, "V24": 0.4732,
+         "V25": -1.9593, "V26": 0.3195, "V27": 0.6005, "V28": 0.1293, "Amount": 1.0}
 
 
 def test_output_has_the_expected_shape():
